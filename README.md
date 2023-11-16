@@ -13,8 +13,8 @@ This option is for testing purposes and is limited to 50 emails per day.
 
 ## Key configuration during pool creation
 This step is necessary to exchange code for token.
-- When creating the app client, thick `Generate a client secret`. 
-- When selecting about `OpenID connect scopes`, be sure to thick the boxes `aws.cognito.signin.user.admin` and `profile`.
+- When creating the app client, tick `Generate a client secret`. 
+- When selecting about `OpenID connect scopes`, be sure to tick the boxes `aws.cognito.signin.user.admin` and `profile`.
     - `aws.cognito.signin.user.admin` allows to perform operations using boto3
     - `profile` will bring all user data in the ID token. Otherwise we get only email and ID. 
 
@@ -54,11 +54,14 @@ The `ID Token` is a JWT that contains the user data. If we decode it we can get 
 In Python we can decode it with the PyJWT package. The encoding is RS256.
 
 Option 2 - /oauth2/userInfo (this is what we use in this code):  
-Use the `access token` as Authorization when calling the GET /oauth2/userInfo endpoint.
+Use the `access token` as Authorization when calling the GET /oauth2/userInfo endpoint.  
+❗Important!: AWS recommends to wrap the client_id and clien_secret as a single base64 hash that is passed into the Authorization header. Here we passed them as part of the request body, but that's not good as the client_secret may be exposed while in transit.  
+[UserInfo endpoint documentation](https://docs.aws.amazon.com/cognito/latest/developerguide/userinfo-endpoint.html)
 
 Option 3 - Boto3:  
 Basically a wrapper of the above.
-The access token must contain the `aws.cognito.signin.user.admin` scope. This is set when invoquing the hosted UI (see line 24)
+The access token must contain the `aws.cognito.signin.user.admin` scope. This is set when invoquing the hosted UI (see line 24)  
+[boto3 get_user() documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/cognito-idp/client/get_user.html)
 ```python
 import boto3
 client = boto3.client('cognito-idp', region_name='us-east-1')
