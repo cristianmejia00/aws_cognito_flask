@@ -41,24 +41,24 @@ We either create our own sign up form, or set them programatically (e.g., with b
 ---
 Notes: 
 
-How to get the user data.
-__by user data we mean the user attributes we set when creating the user pool__
-To get **all** attributes we must pass `profile` as part of the scope string in the login URL of the Hosted UI. (see line 24 in app.py)
-When users log in we receive the code in the callback url. This is then exchanged by tokens.
+How to get the user data.  
+_By user data we mean the user attributes we set when creating the user pool._
+To get **all** attributes we must pass `profile` as part of the scope string in the login URL of the Hosted UI (see line 24 in app.py).  
+When users log in we receive the code in the callback url. This is then exchanged for 3 tokens.
 - ID token: User data
 - access token: Authorization code for the user to interact with our app (for eaxmaple retrieve or update his/her user data)
 - refresh token: to re-generate the ID and access tokens. The refresh token has a longer life than the other two (30 days vs 1 hour by default)
 
-Option 1 - JWT:
+Option 1 - JWT:  
 The `ID Token` is a JWT that contains the user data. If we decode it we can get the user attributes.
 In Python we can decode it with the PyJWT package. The encoding is RS256.
 
-Option 2 - /oauth2/userInfo (this is what we use in this code)
+Option 2 - /oauth2/userInfo (this is what we use in this code):  
 Use the `access token` as Authorization when calling the GET /oauth2/userInfo endpoint.
 
-Option 3 - Boto3:
+Option 3 - Boto3:  
 Basically a wrapper of the above.
-The access token mus contain the `aws.cognito.signin.user.admin` scope. This is set when invoquing the hosted UI (see line 24)
+The access token must contain the `aws.cognito.signin.user.admin` scope. This is set when invoquing the hosted UI (see line 24)
 ```python
 import boto3
 client = boto3.client('cognito-idp', region_name='us-east-1')
@@ -68,6 +68,6 @@ response = client.get_user(
 response.json()
 ```
 
-- About custom user attributes:
+- About custom user attributes in the hosted UI [[SO](https://stackoverflow.com/questions/73521195/is-there-a-way-to-use-custom-attributes-for-amazon-cognito-using-the-hosted-ui)]:
     - >"AWS says that at this moment, unfortunately, it is not possible to show the custom attributes on the Cognito hosted UI sign-up page. Also, the custom attributes cannot be marked as “required”."
     - >"As for the second Question. Custom attributes will not be reflected in the Users/Groups area until they are added to the user, which, again, cannot be done through the Hosted UI."

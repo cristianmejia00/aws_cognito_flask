@@ -38,7 +38,7 @@ def logged_in():
         'scope': 'profile',
         'code': code
     }
-    print(payload)
+
     # Making the POST request
     tokens_response = requests.post(token_url, headers=headers, data=payload)
 
@@ -46,8 +46,8 @@ def logged_in():
     if tokens_response.status_code == 200:
         # Successful token exchange
         tokens = tokens_response.json()
-        print("Access Token:", tokens['access_token'])
-        print("ID Token:", tokens['id_token'])
+        #print("Access Token:", tokens['access_token'])
+        #print("ID Token:", tokens['id_token'])
         #print("Refresh Token:", tokens['refresh_token'])
 
         user_info_url = f"{os.getenv('COGNITO_DOMAIN')}/oauth2/userInfo"
@@ -66,7 +66,11 @@ def logged_in():
 
 @app.route('/logout')
 def logout():
-    pass
+    print('logging out!')
+    # Log the user out and redirect her/him to any other page
+    #return redirect(f"{os.getenv('COGNITO_DOMAIN')}/logout?client_id={os.getenv('CLIENT_ID')}&logout_uri=http://localhost:8080/logged_out")
+    # Automatically return to the log in hosted UI 
+    return redirect(f"{os.getenv('COGNITO_DOMAIN')}/logout?client_id={os.getenv('CLIENT_ID')}&response_type=code&scope=email+openid+phone+profile+aws.cognito.signin.user.admin&redirect_uri={os.getenv('REDIRECT_URI')}")
 
 if __name__ == "__main__":
     app.run(debug = True,  host='0.0.0.0', port=8080)
