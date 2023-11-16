@@ -38,10 +38,12 @@ def logged_in():
     payload = {
         'grant_type': 'authorization_code',
         'client_id': os.getenv('CLIENT_ID'),
+        'client_secret':os.getenv('CLIENT_SECRET'),
         'redirect_uri': os.getenv('REDIRECT_URI'),
+        'scope': 'profile',
         'code': code
     }
-
+    print(payload)
     # Making the POST request
     response = requests.post(token_url, headers=headers, data=payload)
 
@@ -51,11 +53,28 @@ def logged_in():
         tokens = response.json()
         print("Access Token:", tokens['access_token'])
         print("ID Token:", tokens['id_token'])
-        print("Refresh Token:", tokens['refresh_token'])
+        #print("Refresh Token:", tokens['refresh_token'])
+
+        # user_login = client.initiate_auth(
+        #     ClientId=os.getenv('CLIENT_ID'),
+        #     AuthFlow='REFRESH_TOKEN_AUTH',
+        #     AuthParameters={
+        #         'REFRESH_TOKEN': tokens['refresh_token']
+        #     }
+        # )
+        # print("Boto3 Access Token:", user_login['AuthenticationResult']['AccessToken'])
         
         # Get the user data
-        user_data = client.get_user(AccessToken=tokens['access_token'])
-        return user_data
+        #user_data = client.get_user(AccessToken=user_login['AuthenticationResult']['AccessToken'])
+        #user_data = client.get_user(AccessToken=tokens['access_token'])
+
+        user_info_url = f"{os.getenv('COGNITO_DOMAIN')}/oauth2/userInfo"
+        headers = {
+            'Authorization': f"Bearer {tokens['access_token']}"
+        }
+        user_data = requests.get(user_info_url, headers=headers)
+        print(user_data.json())
+        return 'success!'
         
     else:
         # Handle errors

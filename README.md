@@ -11,6 +11,12 @@ Optionally, we would need to opt in for Cognito to send messages in our behalf.
 This option is for testing purposes and is limited to 50 emails per day. 
 
 
+## Key configuration during pool creation
+This step is necessary to exchange code for token.
+- When creating the app client, thick `Generate a client secret`. 
+- When selecting about `OpenID connect scopes`, be sure to thick the box `aws.cognito.signin.user.admin`.
+
+
 ## Hosted UI
 The hosted UI link is located in
 ```
